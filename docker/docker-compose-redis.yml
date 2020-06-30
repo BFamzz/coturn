@@ -5,6 +5,7 @@ services:
   redis:
     build:
       context: ./redis
+    container_name: stun_redis
     restart: unless-stopped
     volumes:
       - redis-data:/data
@@ -18,6 +19,7 @@ services:
   coturn:
     build:
       context: ./coturn
+    container_name: coturn
     restart: always
     volumes:
       - ${PWD}/coturn/turnserver.conf:/etc/turnserver.conf
