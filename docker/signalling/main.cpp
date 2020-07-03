@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 		})
 		.onopen([&](crow::websocket::connection &conn){
 			std::lock_guard<std::mutex> _(mtx);
-			activePeers.insert(uid, make_pair(&conn, ""));
+			activePeers.insert(std::make_pair(uid, std::make_pair(&conn, "")));
 
 			/* Send unique turn-server credentials */
 			
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
 			/* Logging */
 			std::cout << "websocket...onclose()\n";
-			activePeers.erase(&conn);
+			//activePeers.erase(&conn);
 
 		})
 		.onmessage([&](crow::websocket::connection &conn, const std::string &data, bool is_binary) {
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 				return;
 			}
 
-			nlohmann::json jsonMessage = nlohmann::json:parse(data);
+			nlohmann::json jsonMessage = nlohmann::json::parse(data);
 
 			/* If user session is not null, forward the message to the other peer */
 			std::unordered_map<std::string, std::pair<crow::websocket::connection *, 
@@ -79,21 +79,21 @@ int main(int argc, char *argv[])
 			}
 
 			/* Check if the session is not empty or status == 'session' */
-			if (!currentPeer->second->second.empty())
+			if (!currentPeer.second->second.empty())
 			{
 				std::unordered_map<std::string, std::string>::const_iterator otherPeerId = 
 					peerPairs.find(jsonMessage["caller"]);
 				std::unordered_map<std::string, std::pair<crow::websocket::connection *, 
 				std::string>>::const_iterator otherPeer = activePeers.find(otherPeerId->second);
 
-				if (!otherPeer->second->second.empty())
+				if (!otherPeer->second.second.empty())
 				{
-					currentPeer->second->first->send_text(data);
+					currentPeer->second.first->send_text(data);
 					return;
 				}
 				else
 				{
-					currentPeer->second->first->close();
+					currentPeer->second.first->close();
 					return;
 				}
 			}
@@ -105,21 +105,21 @@ int main(int argc, char *argv[])
 					= activePeers.find(jsonMessage["recipient"]);
 
 				/* Get other peer status from Redis jsonMessage["recipient"] */
-				if (otherPeer.status != "session" && currentPeer.status != "session")
+				if (otherPeer.second->second != "session" && currentPeer->second->second != "session")
 				{
-					currentPeer->second->second->send_text("BUSY");
+					currentPeer->second->first->send_text("BUSY");
 
 					/* Close websocket connection */
-					activePeers.erase([message[uid]]);
+					//activePeers.erase([message[uid]]);
 					return;
 				}
-				currentPeer->second->second->send_text("CALL_INITIATED");
+				currentPeer->second.first->send_text("CALL_INITIATED");
 
 				/* Register session */
 				peerPairs.insert({jsonMessage["caller"], jsonMessage["recipient"]});
-				currentPeer->second->second = "session";
+				currentPeer->second.second = "session";
 				peerPairs.insert({jsonMessage["recipient"], jsonMessage["caller"]});
-				otherPeer->second->second = "session";
+				otherPeer->second.second = "session";
 			}
 
 			/* Get the recipient of the call */
