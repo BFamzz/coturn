@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 			}
 
 			/* Check if the session is not empty or status == 'session' */
-			if (!currentPeer.second->second.empty())
+			if (!currentPeer->second.second.empty())
 			{
 				std::unordered_map<std::string, std::string>::const_iterator otherPeerId = 
 					peerPairs.find(jsonMessage["caller"]);
@@ -101,13 +101,13 @@ int main(int argc, char *argv[])
 			/* Check message */
 			else if (jsonMessage["purpose"] == "INITIATE_CALL")
 			{
-				std::unordered_map<std::string, std::pair<crow::websocket::connection *>>::const_iterator otherPeer
-					= activePeers.find(jsonMessage["recipient"]);
+				std::unordered_map<std::string, std::pair<crow::websocket::connection *, std::string>>::const_iterator 
+					otherPeer = activePeers.find(jsonMessage["recipient"]);
 
 				/* Get other peer status from Redis jsonMessage["recipient"] */
 				if (otherPeer.second->second != "session" && currentPeer->second->second != "session")
 				{
-					currentPeer->second->first->send_text("BUSY");
+					currentPeer->second.first->send_text("BUSY");
 
 					/* Close websocket connection */
 					//activePeers.erase([message[uid]]);
