@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 		})
 		.onopen([&](crow::websocket::connection &conn){
 			std::lock_guard<std::mutex> _(mtx);
-			activePeers.insert(uid, std::make_pair(&conn, ""));
+			activePeers.insert(uid, make_pair(&conn, ""));
 
 			/* Send unique turn-server credentials */
 			
@@ -132,7 +132,6 @@ int main(int argc, char *argv[])
 	std::cout << "PORT = " << iPort << "\n";
 
 	app.port(iPort).multithreaded().run();
-	c.disconnect();
 	return 0;
 }
 
