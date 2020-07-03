@@ -1,8 +1,8 @@
-version: "3"
-services:
+version: "3.8"
 
+services:
 # Redis
-  redis:
+  stun_turn_redis:
     build:
       context: ./redis
     container_name: stun_turn_redis
@@ -15,8 +15,20 @@ services:
       - backend
 
   signalling_server:
-    image: nginx:mainline-alpine
+    build:
+      context: ./signalling_server
+    image: signalling_server
     container_name: signalling_server
+    restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD
+      - PORT
+    networks:
+      - backend
+
+  webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
     restart: unless-stopped
     ports:
       - "80:80"
@@ -28,7 +40,7 @@ services:
       - certbot-var:/var/lib/letsencrypt
       - dhparam:/etc/ssl/certs
     depends_on:
-      - certbot
+      - signalling_server
     networks:
       - frontend
       - backend
@@ -41,7 +53,7 @@ services:
       - certbot-var:/var/lib/letsencrypt
       - web-root:/var/www/html
     depends_on:
-      - signalling_server
+      - webserver
     command: certonly --webroot --webroot-path=/var/www/html --email onlineservices@famzzie.com --agree-tos --no-eff-email --staging -d stun.famzzie.com -d turn.famzzie.com
 
 # Coturn
@@ -77,6 +89,7 @@ services:
       - backend
     depends_on:
       - redis
+      - signalling_server
     env_file:
       - coturn/coturn.env
 # DB
@@ -89,13 +102,13 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/bfamz/coturn/docker/coturn/public/
+      device: /home/bfamz/coturn/docker/public/
       o: bind
   dhparam:
     driver: local
     driver_opts:
       type: none
-      device: /home/bfamz/zest-dev-webserver/dhparam/
+      device: /home/bfamz/coturn/docker/dhparam/
       o: bind
 
 networks:
