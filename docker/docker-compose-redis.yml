@@ -5,7 +5,7 @@ services:
   redis:
     build:
       context: ./redis
-    container_name: stun_redis
+    container_name: stun_turn_redis
     restart: unless-stopped
     volumes:
       - redis-data:/data
@@ -14,6 +14,35 @@ services:
     networks:
       - backend
 
+  signalling_server:
+    image: nginx:mainline-alpine
+    container_name: signalling_server
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
+    depends_on:
+      - certbot
+    networks:
+      - frontend
+      - backend
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - signalling_server
+    command: certonly --webroot --webroot-path=/var/www/html --email onlineservices@famzzie.com --agree-tos --no-eff-email --staging -d stun.famzzie.com -d turn.famzzie.com
 
 # Coturn
   coturn:
@@ -23,23 +52,23 @@ services:
     restart: always
     volumes:
       - ${PWD}/coturn/turnserver.conf:/etc/turnserver.conf
-      - ${PWD}/coturn/privkey.pem:/etc/ssl/private/privkey.pem
-      - ${PWD}/coturn/cert.pem:/etc/ssl/certs/cert.pem
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
     ports:
 ## STUN/TURN
       - "3478:3478"
       - "3478:3478/udp"
       - "3479:3479"
       - "3479:3479/udp"
-      - "80:80"
-      - "80:80/udp"
+#      - "80:80"
+#      - "80:80/udp"
 ## STUN/TURN SSL
       - "5349:5349"
       - "5349:5349/udp"
       - "5350:5350"
       - "5350:5350/udp"
-      - "443:443"
-      - "443:443/udp"
+#      - "443:443"
+#      - "443:443/udp"
 # Relay Ports
 #      - "49152-65535:49152-65535"
 #      - "49152-65535:49152-65535/udp"
@@ -54,6 +83,20 @@ services:
       - redis/redis.env
 volumes:
   redis-data:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/bfamz/coturn/docker/coturn/public/
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/bfamz/zest-dev-webserver/dhparam/
+      o: bind
 
 networks:
   frontend:
@@ -63,4 +106,4 @@ networks:
       config:
         - subnet: 172.16.238.0/24
   backend:
-    internal: true
+    internal: true #Restrict external access to the network
