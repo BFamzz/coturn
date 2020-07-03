@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 					otherPeer = activePeers.find(jsonMessage["recipient"]);
 
 				/* Get other peer status from Redis jsonMessage["recipient"] */
-				if (otherPeer.second->second != "session" && currentPeer->second->second != "session")
+				if (otherPeer->second.second != "session" && currentPeer->second.second != "session")
 				{
 					currentPeer->second.first->send_text("BUSY");
 
