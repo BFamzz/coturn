@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 			nlohmann::json jsonMessage = nlohmann::json::parse(data);
 
 			/* If user session is not null, forward the message to the other peer */
-			std::unordered_map<std::string, std::pair<crow::websocket::connection *, 
+			const std::unordered_map<std::string, std::pair<crow::websocket::connection *, 
 				std::string>>::const_iterator currentPeer = activePeers.find(jsonMessage["caller"]);
 
 			if (currentPeer == activePeers.end())
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 			/* Check message */
 			else if (jsonMessage["purpose"] == "INITIATE_CALL")
 			{
-				std::unordered_map<std::string, std::pair<crow::websocket::connection *, std::string>>::const_iterator 
+				const std::unordered_map<std::string, std::pair<crow::websocket::connection *, std::string>>::const_iterator 
 					otherPeer = activePeers.find(jsonMessage["recipient"]);
 
 				/* Get other peer status from Redis jsonMessage["recipient"] */
@@ -117,9 +117,9 @@ int main(int argc, char *argv[])
 
 				/* Register session */
 				peerPairs.insert({jsonMessage["caller"], jsonMessage["recipient"]});
-				currentPeer->second->second = "session";
+				currentPeer->second.second = "session";
 				peerPairs.insert({jsonMessage["recipient"], jsonMessage["caller"]});
-				otherPeer->second->second = "session";
+				otherPeer->second.second = "session";
 			}
 
 			/* Get the recipient of the call */
