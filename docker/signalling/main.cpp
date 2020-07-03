@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 		})
 		.onopen([&](crow::websocket::connection &conn){
 			std::lock_guard<std::mutex> _(mtx);
-			activePeers.insert(uid, {&conn, ""});
+			activePeers.insert(uid, std::pair<crow::websocket::connection *, std::string>::value_type(&conn, ""));
 
 			/* Send unique turn-server credentials */
 			
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
 			/* Logging */
 			std::cout << "websocket...onclose()\n";
-			users.erase(&conn);
+			activePeers.erase(&conn);
 
 		})
 		.onmessage([&](crow::websocket::connection &conn, const std::string &data, bool is_binary) {
