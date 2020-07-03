@@ -117,9 +117,9 @@ int main(int argc, char *argv[])
 
 				/* Register session */
 				peerPairs.insert({jsonMessage["caller"], jsonMessage["recipient"]});
-				currentPeer->second.second = "session";
+				currentPeer->second->second = "session";
 				peerPairs.insert({jsonMessage["recipient"], jsonMessage["caller"]});
-				otherPeer->second.second = "session";
+				otherPeer->second->second = "session";
 			}
 
 			/* Get the recipient of the call */
