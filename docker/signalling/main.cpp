@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 		})
 		.onopen([&](crow::websocket::connection &conn){
 			std::lock_guard<std::mutex> _(mtx);
-			activePeers.insert(uid, std::pair<crow::websocket::connection *, std::string>::value_type(&conn, ""));
+			activePeers.insert(uid, std::make_pair(&conn, ""));
 
 			/* Send unique turn-server credentials */
 			
