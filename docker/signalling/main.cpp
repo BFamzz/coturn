@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
 			/* If user session is not null, forward the message to the other peer */
 			std::unordered_map<std::string, std::pair<crow::websocket::connection *, 
-				std::string>>::const_iterator currentPeer = activePeers.find(jsonMessage["caller"]);
+				std::string>>::iterator currentPeer = activePeers.find(jsonMessage["caller"]);
 
 			if (currentPeer == activePeers.end())
 			{
@@ -117,9 +117,9 @@ int main(int argc, char *argv[])
 
 				/* Register session */
 				peerPairs.insert({jsonMessage["caller"], jsonMessage["recipient"]});
-				currentPeer->second.second = std::string("session");
+				currentPeer->second.second = "session";
 				peerPairs.insert({jsonMessage["recipient"], jsonMessage["caller"]});
-				otherPeer->second.second = std::string("session");
+				otherPeer->second.second = "session";
 			}
 
 			/* Get the recipient of the call */
