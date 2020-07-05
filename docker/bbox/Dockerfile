@@ -1,4 +1,4 @@
-FROM gcc:9.2.0
+FROM gcc:10.1.0
 
 RUN printf "deb https://deb.debian.org/debian buster main\ndeb-src https://deb.debian.org/debian buster main\ndeb https://deb.debian.org/debian-security/ buster/updates main\ndeb-src https://deb.debian.org/debian-security/ buster/updates main\ndeb https://deb.debian.org/debian buster-updates main\ndeb-src https://deb.debian.org/debian buster-updates main" > /etc/apt/sources.list
 
