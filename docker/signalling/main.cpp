@@ -7,7 +7,7 @@
 //#include <boost/filesystem.hpp>
 
 #include "headers/crow_all.h"
-//#include "headers/nlohmann/json.hpp"
+#include "headers/nlohmann/json.hpp"
 #include "/usr/src/acl/lib_acl_cpp/include/acl_cpp/lib_acl.hpp"
 
 int main(int argc, char *argv[])
