@@ -118,9 +118,9 @@ int main(int argc, char *argv[])
 				currentPeer->second.first->send_text("CALL_INITIATED");
 
 				/* Register session */
-				//peerPairs.insert({jsonMessage["caller"], jsonMessage["recipient"]});
+				peerPairs.insert({jsonMessage["caller"].get_ref<std::string&>(), jsonMessage["recipient"].get_ref<std::string&>()});
 				currentPeer->second.second = "session";
-				//peerPairs.insert({jsonMessage["recipient"], jsonMessage["caller"]});
+				peerPairs.insert({jsonMessage["recipient"].get_ref<std::string&>(), jsonMessage["caller"].get_ref<std::string&>()});
 				otherPeer->second.second = "session";
 			}
 
