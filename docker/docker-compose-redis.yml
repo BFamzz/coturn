@@ -16,7 +16,7 @@ services:
 
   signalling_server:
     build:
-      context: ./signalling_server
+      context: ./signalling
     image: signalling_server
     container_name: signalling_server
     restart: unless-stopped
