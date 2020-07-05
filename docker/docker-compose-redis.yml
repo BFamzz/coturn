@@ -55,7 +55,7 @@ services:
       - web-root:/var/www/html
     depends_on:
       - webserver
-    command: certonly --webroot --webroot-path=/var/www/html --email onlineservices@famzzie.com --agree-tos --no-eff-email --staging -d stun.famzzie.com -d turn.famzzie.com
+    command: certonly --webroot --webroot-path=/var/www/html --email onlineservices@famzzie.com --agree-tos --no-eff-email --force-renewal -d stun.famzzie.com -d turn.famzzie.com
 
 # Coturn
   coturn:
