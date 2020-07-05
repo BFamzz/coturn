@@ -88,7 +88,7 @@ services:
       - frontend
       - backend
     depends_on:
-      - redis
+      - stun_turn_redis
       - signalling_server
     env_file:
       - coturn/coturn.env
