@@ -65,12 +65,12 @@ RUN if ! getent group "$TURNSERVER_GROUP" >/dev/null; then \
 
 # set startup parameters
 # STUN/TURN PORTS
-EXPOSE 3478 3479 3478/udp 3479/udp 80 80/udp
-EXPOSE 5349 5350 5349/udp 5350/udp 443 443/udp
+EXPOSE 3478 3479 3478/udp 3479/udp #80 80/udp
+EXPOSE 5349 5350 5349/udp 5350/udp #443 443/udp
 # CLI
 EXPOSE 5766
 # Relay Ports
-EXPOSE 49152-65535 49152-65535/udp
+#EXPOSE 49152-65535 49152-65535/udp
 
 #COPY ./docker-entrypoint.sh /
 #ENTRYPOINT ["/docker-entrypoint.sh"]

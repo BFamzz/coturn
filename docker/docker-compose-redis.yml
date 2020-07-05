@@ -2,10 +2,11 @@ version: "3.8"
 
 services:
 # Redis
-  stun_turn_redis:
+  coturn_redis:
     build:
       context: ./redis
-    container_name: stun_turn_redis
+    image: coturn_redis
+    container_name: coturn_redis
     restart: unless-stopped
     volumes:
       - redis-data:/data
@@ -14,11 +15,11 @@ services:
     networks:
       - backend
 
-  signalling_server:
+  signalling:
     build:
       context: ./signalling
-    image: signalling_server
-    container_name: signalling_server
+    image: signalling
+    container_name: signalling
     restart: unless-stopped
     environment:
       - REDIS_PASSWORD
@@ -40,7 +41,7 @@ services:
       - certbot-var:/var/lib/letsencrypt
       - dhparam:/etc/ssl/certs
     depends_on:
-      - signalling_server
+      - signalling
     networks:
       - frontend
       - backend
@@ -60,6 +61,7 @@ services:
   coturn:
     build:
       context: ./coturn
+    image: coturn
     container_name: coturn
     restart: always
     volumes:
@@ -88,8 +90,8 @@ services:
       - frontend
       - backend
     depends_on:
-      - stun_turn_redis
-      - signalling_server
+      - coturn_redis
+      - signalling
     env_file:
       - coturn/coturn.env
 # DB
