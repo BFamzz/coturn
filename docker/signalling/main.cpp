@@ -19,7 +19,16 @@ int main(int argc, char *argv[])
 	std::unordered_map<std::string, std::string> peerPairs;
 
 	/* Connection to redis database */
+	const char* redis_addr = "coturn_redis:6379";
+	int conn_timeout = 10, rw_timeout = 10;
 
+	// the redis client connection
+	acl::redis_client conn(redis_addr, conn_timeout, rw_timeout);
+	conn.set_password(getenv("COTURN_REDIS_PASSWORD"));
+
+	/* if the database number is > 0 */
+	//conn.set_db();
+	acl::redis cmd(&conn);
 
 	/*********************************** CHAT WEBSOCKET ******************************************/
 	CROW_ROUTE(app, "/api/v1/hospitals/call")
